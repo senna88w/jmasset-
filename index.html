@@ -1355,7 +1355,6 @@
             const card = document.createElement('div');
             card.className = 'asset-card';
             card.setAttribute('data-file-id', asset.fileId);
-            card.setAttribute('draggable', 'false');
 
             const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
             const viewUrl = `https://drive.google.com/file/d/${asset.fileId}`;
