@@ -658,6 +658,126 @@
             margin-top: auto;
         }
 
+        /* Recently Added Section */
+        .recent-section {
+            padding: 24px 40px 0;
+            border-bottom: 2px solid var(--border-light);
+            background: linear-gradient(180deg, rgba(212,235,228,0.15) 0%, var(--white) 100%);
+        }
+        .recent-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .recent-header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .recent-title {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--charcoal-green);
+        }
+        .recent-count {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .recent-toggle {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 5px 12px;
+            border: 1px solid var(--border-light);
+            background: var(--white);
+            color: var(--charcoal-green);
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.15s ease;
+        }
+        .recent-toggle:hover {
+            border-color: var(--charcoal-green);
+        }
+        .recent-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 24px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .recent-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .recent-scroll::-webkit-scrollbar-track {
+            background: var(--warm-gray);
+            border-radius: 2px;
+        }
+        .recent-scroll::-webkit-scrollbar-thumb {
+            background: rgba(24, 59, 53, 0.2);
+            border-radius: 2px;
+        }
+        .recent-card {
+            flex: 0 0 200px;
+            scroll-snap-align: start;
+            border: 1.5px solid rgba(24, 59, 53, 0.12);
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--white);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .recent-card:hover {
+            border-color: var(--charcoal-green);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .recent-card .asset-thumbnail {
+            aspect-ratio: 1;
+        }
+        .recent-card .recent-card-details {
+            padding: 10px 12px;
+        }
+        .recent-card .asset-metadata {
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+        .recent-card .badge {
+            font-size: 8px;
+            padding: 3px 6px;
+        }
+        .recent-new-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            background: var(--charcoal-green);
+            color: var(--white);
+            border-radius: 3px;
+            z-index: 10;
+        }
+        .recent-date {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
         /* ========== Mobile Responsive ========== */
 
         @media (max-width: 1024px) {
@@ -771,6 +891,16 @@
             }
             .placeholder-name {
                 font-size: 8px;
+            }
+
+            .recent-section {
+                padding: 16px 16px 0;
+            }
+            .recent-card {
+                flex: 0 0 150px;
+            }
+            .recent-scroll {
+                gap: 10px;
             }
 
             .hover-preview {
@@ -905,6 +1035,18 @@
         <div class="select-all-bar">
             <input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox">
             <label for="selectAllCheckbox" class="select-all-label">SELECT ALL VISIBLE</label>
+        </div>
+
+        <!-- Recently Added -->
+        <div class="recent-section" id="recentSection" style="display:none;">
+            <div class="recent-header">
+                <div class="recent-header-left">
+                    <h2 class="recent-title">Recently Added</h2>
+                    <span class="recent-count" id="recentCount"></span>
+                </div>
+                <button class="recent-toggle" id="recentToggle">HIDE</button>
+            </div>
+            <div class="recent-scroll" id="recentScroll"></div>
         </div>
 
         <!-- Asset Grid -->
@@ -1053,6 +1195,93 @@
             attachEventListeners();
             updateLastUpdated();
             initDropdowns();
+            renderRecentlyAdded();
+        }
+
+        // Recently Added Section
+        function renderRecentlyAdded() {
+            const recentSection = document.getElementById('recentSection');
+            const recentScroll = document.getElementById('recentScroll');
+            const recentCount = document.getElementById('recentCount');
+            const recentToggle = document.getElementById('recentToggle');
+
+            // Get assets with dates, sorted newest first
+            const datedAssets = allAssets
+                .filter(a => a.createdDate)
+                .sort((a, b) => b.createdDate.localeCompare(a.createdDate));
+
+            if (datedAssets.length === 0) {
+                // No dates yet — show most recent 20 by position (newest at end of array)
+                const recent = allAssets.slice(-20).reverse();
+                if (recent.length === 0) return;
+                buildRecentCards(recent, recentScroll, false);
+                recentCount.textContent = recent.length + ' assets';
+            } else {
+                // Show assets from the last 30 days
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - 30);
+                const cutoffStr = cutoff.toISOString().split('T')[0];
+                const recent = datedAssets.filter(a => a.createdDate >= cutoffStr).slice(0, 50);
+                if (recent.length === 0) {
+                    // If none in 30 days, show newest 20
+                    buildRecentCards(datedAssets.slice(0, 20), recentScroll, true);
+                    recentCount.textContent = '20 newest assets';
+                } else {
+                    buildRecentCards(recent, recentScroll, true);
+                    recentCount.textContent = recent.length + ' in the last 30 days';
+                }
+            }
+
+            recentSection.style.display = 'block';
+
+            // Toggle visibility
+            let visible = true;
+            recentToggle.addEventListener('click', () => {
+                visible = !visible;
+                recentScroll.style.display = visible ? 'flex' : 'none';
+                recentToggle.textContent = visible ? 'HIDE' : 'SHOW';
+            });
+        }
+
+        function buildRecentCards(assets, container, showDate) {
+            container.innerHTML = '';
+            assets.forEach(asset => {
+                const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
+                const viewUrl = 'https://drive.google.com/file/d/' + asset.fileId;
+
+                const card = document.createElement('div');
+                card.className = 'recent-card';
+
+                card.innerHTML =
+                    '<span class="recent-new-badge">New</span>' +
+                    '<div class="asset-thumbnail">' +
+                        (isImage ? '' : '<div class="placeholder"><span class="placeholder-format">' + asset.format + '</span><span class="placeholder-name">' + asset.type + '</span></div>') +
+                    '</div>' +
+                    '<div class="recent-card-details">' +
+                        '<div class="asset-metadata">' + asset.format + ' &bull; ' + asset.type + '</div>' +
+                        '<div class="asset-badges"><span class="badge badge-product">' + asset.product + '</span></div>' +
+                        (showDate && asset.createdDate ? '<div class="recent-date">Added ' + asset.createdDate + '</div>' : '') +
+                    '</div>';
+
+                if (isImage) {
+                    const thumb = card.querySelector('.asset-thumbnail');
+                    const img = document.createElement('img');
+                    img.src = 'https://lh3.googleusercontent.com/d/' + asset.fileId + '=w400';
+                    img.alt = asset.filename;
+                    img.loading = 'lazy';
+                    img.onerror = function() {
+                        this.remove();
+                        thumb.innerHTML = '<div class="placeholder"><span class="placeholder-format">' + asset.format + '</span><span class="placeholder-name">' + asset.type + '</span></div>';
+                    };
+                    thumb.appendChild(img);
+                }
+
+                card.addEventListener('click', () => {
+                    window.open(viewUrl, '_blank');
+                });
+
+                container.appendChild(card);
+            });
         }
 
         // Initialize dropdowns

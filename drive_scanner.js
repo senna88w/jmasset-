@@ -164,7 +164,8 @@ function scanFolder(folder, product, type, results, validMimes, depth) {
         filename: file.getName(),
         product: product,
         type: type,
-        format: FORMAT_MAP[mime] || 'JPG'
+        format: FORMAT_MAP[mime] || 'JPG',
+        createdDate: file.getDateCreated().toISOString().split('T')[0]
       });
     }
   }

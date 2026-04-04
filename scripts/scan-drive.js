@@ -75,7 +75,7 @@ async function scanFolder(drive, folderId, product, type, depth = 0) {
   do {
     const res = await drive.files.list({
       q: `'${folderId}' in parents and trashed = false`,
-      fields: 'nextPageToken, files(id, name, mimeType)',
+      fields: 'nextPageToken, files(id, name, mimeType, createdTime)',
       pageSize: 1000,
       pageToken,
       supportsAllDrives: true,
@@ -94,6 +94,7 @@ async function scanFolder(drive, folderId, product, type, depth = 0) {
           product,
           type,
           format: FORMAT_MAP[file.mimeType],
+          createdDate: file.createdTime ? file.createdTime.split('T')[0] : null,
         });
       }
     }
