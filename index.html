@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOYMODE ASSET LIBRARY</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --charcoal-green: #183B35;
+            --ember: #FF5D37;
+            --charcoal: #231F20;
+            --warm-gray: #F5F4F0;
+            --snow-white: #FAFEFF;
+            --seafoam: #D4EBE4;
+            --border: #000000;
+            --border-light: rgba(0,0,0,0.12);
+            --text-muted: rgba(0,0,0,0.5);
+            --cta-blue: #1742F2;
+            --font-display: 'Inter', Helvetica, Arial, sans-serif;
+            --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: var(--font-body);
+            background-color: var(--white);
+            color: var(--black);
+            line-height: 1.5;
+        }
+
+
+        /* Main layout container */
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            padding: 36px 40px 32px;
+            border-bottom: 2px solid var(--black);
+            background-color: var(--white);
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            color: var(--black);
+            line-height: 1;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .toolbar-row-1 {
+            display: flex;
+            align-items: center;
+            padding: 14px 40px;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-row-2 {
+            display: flex;
+            align-items: center;
+            padding: 8px 40px;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--warm-gray);
+            flex-wrap: wrap;
+        }
+
+        .quick-link-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--charcoal-green);
+            opacity: 0.5;
+            margin-right: 4px;
+            line-height: 26px;
+        }
+
+        .quick-link {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--charcoal-green);
+            text-decoration: none;
+            padding: 4px 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 3px;
+            background: var(--white);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .quick-link:hover {
+            border-color: var(--charcoal-green);
+            background: var(--seafoam);
+        }
+
+        .asset-card[draggable="true"] {
+            cursor: grab;
+        }
+        .asset-card[draggable="true"]:active {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .filter-divider {
+            width: 1px;
+            height: 28px;
+            background-color: var(--border-light);
+            margin: 0 10px;
+        }
+
+        .filter-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--charcoal-green);
+        }
+
+        .search-input {
+            font-family: var(--font-body);
+            font-size: 14px;
+            padding: 9px 14px;
+            border: 1.5px solid rgba(24, 59, 53, 0.18);
+            background-color: var(--white);
+            color: var(--black);
+            border-radius: 4px;
+            cursor: text;
+            transition: all 0.2s ease;
+            width: 200px;
+        }
+
+        .filter-select {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 9px 12px;
+            border: 1.5px solid rgba(24, 59, 53, 0.18);
+            background-color: var(--white);
+            color: var(--black);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 140px;
+        }
+
+        .search-input::placeholder {
+            color: var(--charcoal-green);
+            opacity: 0.35;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--charcoal-green);
+            box-shadow: 0 0 0 3px rgba(24, 59, 53, 0.08);
+        }
+
+        .asset-count {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--charcoal-green);
+        }
+
+        .toolbar-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--charcoal-green);
+            opacity: 0.35;
+        }
+
+        .auto-refresh-btn {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 7px 14px;
+            border: 1.5px solid var(--charcoal-green);
+            background-color: var(--white);
+            color: var(--charcoal-green);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .auto-refresh-btn:hover {
+            background-color: var(--charcoal-green);
+            color: var(--white);
+        }
+
+        .auto-refresh-btn.refreshing {
+            background-color: var(--charcoal-green);
+            color: var(--white);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .view-toggle-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--charcoal-green);
+            opacity: 0.45;
+            margin-right: 4px;
+        }
+
+        .view-button {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 6px 12px;
+            border: 1.5px solid rgba(24, 59, 53, 0.15);
+            background-color: var(--white);
+            color: var(--charcoal-green);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .view-button:hover {
+            border-color: var(--charcoal-green);
+            background-color: rgba(212, 235, 228, 0.3);
+        }
+
+        .view-button.active {
+            border-color: var(--charcoal-green);
+            background-color: var(--charcoal-green);
+            color: var(--white);
+        }
+
+        /* Select All Bar */
+        .select-all-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 40px;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-light);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--charcoal-green);
+            opacity: 0.7;
+        }
+
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--charcoal-green);
+        }
+
+        .select-all-label {
+            cursor: pointer;
+        }
+
+        /* Content */
+        .content-wrapper {
+            padding: 40px;
+            flex: 1;
+        }
+
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .asset-grid.grid-6 {
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        .asset-grid.grid-10 {
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .asset-card {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease both;
+            border: 1.5px solid rgba(24, 59, 53, 0.12);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background-color: var(--white);
+            position: relative;
+        }
+
+        .asset-card:hover {
+            border-color: var(--charcoal-green);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .asset-card.selected {
+            border-color: var(--charcoal-green);
+            background-color: rgba(212, 235, 228, 0.2);
+        }
+
+        .asset-card-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 18px;
+            height: 18px;
+            z-index: 10;
+            cursor: pointer;
+            accent-color: var(--charcoal-green);
+        }
+
+        .asset-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: var(--warm-gray);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .asset-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asset-thumbnail .placeholder {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            color: var(--charcoal-green);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px;
+            width: 100%;
+            height: 100%;
+        }
+        .placeholder-format {
+            font-size: 22px;
+            font-weight: 800;
+            opacity: 0.15;
+            letter-spacing: 2px;
+        }
+        .placeholder-name {
+            font-size: 9px;
+            font-weight: 500;
+            opacity: 0.35;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .asset-details {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .asset-name {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black);
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .asset-metadata {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .asset-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            background-color: var(--seafoam);
+            color: var(--charcoal-green);
+        }
+
+        .badge-product {
+            background-color: rgba(24, 59, 53, 0.08);
+        }
+
+        .asset-cta {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--charcoal-green);
+            text-decoration: none;
+            text-align: center;
+            padding: 12px 16px;
+            border: 1.5px solid var(--charcoal-green);
+            border-radius: 4px;
+            transition: all 0.15s ease;
+            margin-top: auto;
+        }
+
+        .asset-cta:hover {
+            background-color: var(--charcoal-green);
+            color: var(--white);
+        }
+
+        /* Hover Preview */
+        .hover-preview {
+            display: none;
+            position: fixed;
+            background-color: var(--white);
+            border: 2px solid var(--charcoal-green);
+            border-radius: 8px;
+            padding: 16px;
+            z-index: 300;
+            max-width: 600px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.16);
+        }
+
+        .hover-preview img {
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .hover-preview-name {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--black);
+            word-break: break-word;
+        }
+
+        /* Floating Action Bar */
+        .floating-action-bar {
+            display: none;
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background-color: var(--charcoal-green);
+            color: var(--white);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 250;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .floating-action-bar.active {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .floating-action-bar:hover {
+            box-shadow: 0 16px 48px rgba(0,0,0,0.24);
+            transform: translateY(-4px);
+        }
+
+        .selected-count {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            border-right: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* More Resources */
+        .more-resources {
+            padding: 48px 40px 32px;
+            border-top: 2px solid var(--black);
+            background: var(--warm-gray);
+        }
+        .more-resources-header {
+            margin-bottom: 24px;
+        }
+        .more-resources-header h3 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--charcoal-green);
+            margin-bottom: 6px;
+        }
+        .more-resources-header p {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .resource-card {
+            display: flex;
+            flex-direction: column;
+            padding: 18px 16px;
+            background: var(--white);
+            border: 1.5px solid var(--border-light);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--charcoal-green);
+            transition: all 0.15s ease;
+        }
+        .resource-card:hover {
+            border-color: var(--charcoal-green);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .resource-count {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 6px;
+            color: var(--charcoal-green);
+        }
+        .resource-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
+        }
+        .resource-sub {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .resource-card-full {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 14px;
+            background: var(--charcoal-green);
+            border-color: var(--charcoal-green);
+            color: var(--white);
+        }
+        .resource-card-full:hover {
+            background: var(--black);
+            border-color: var(--black);
+        }
+        .resource-card-full .resource-label {
+            font-size: 13px;
+        }
+        .resource-card-full .resource-sub {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 24px 40px;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: 1px solid var(--border-light);
+            margin-top: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Content Area -->
+    <div class="main-layout">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Joymode Asset Library</h1>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-row-1">
+                <div class="filter-group">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search assets...">
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Product</span>
+                    <select id="productFilter" class="filter-select">
+                        <option value="">All Products</option>
+                        <option value="Brand">Brand</option>
+                        <option value="Hard+ SPB">Hard+ SPB</option>
+                        <option value="Hard+ NO">Hard+ NO</option>
+                        <option value="Prime T">Prime T</option>
+                        <option value="Ignite">Ignite</option>
+                        <option value="Pro Flo">Pro Flo</option>
+                        <option value="Past Ads">Past Ads</option>
+                        <option value="Creator UGC">Creator UGC</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Type</span>
+                    <select id="typeFilter" class="filter-select">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Format</span>
+                    <select id="formatFilter" class="filter-select">
+                        <option value="">All Formats</option>
+                        <option value="JPG">JPG</option>
+                        <option value="PNG">PNG</option>
+                        <option value="GIF">GIF</option>
+                        <option value="SVG">SVG</option>
+                        <option value="PDF">PDF</option>
+                        <option value="MP4">MP4</option>
+                        <option value="HEIC">HEIC</option>
+                    </select>
+                </div>
+
+                <div class="toolbar-meta">
+                    <div class="asset-count">
+                        <span id="assetCount">0 ASSETS</span>
+                    </div>
+                    <span class="last-updated" id="lastUpdated"></span>
+                    <button class="auto-refresh-btn" id="autoRefreshBtn">REFRESH</button>
+                    <div class="view-toggle">
+                        <span class="view-toggle-label">VIEW</span>
+                        <button class="view-button active" data-view="grid-4">4</button>
+                        <button class="view-button" data-view="grid-6">6</button>
+                        <button class="view-button" data-view="grid-10">10</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- External Links (non-Drive resources) -->
+            <div class="toolbar-row-2">
+                <span class="quick-link-label">External:</span>
+                <a href="https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a" target="_blank" class="quick-link">GASS Videos ↗</a>
+                <a href="https://www.figma.com/design/KjgU10dhEQWiQgGUbsh2Jk/Ad-Exploration?node-id=1-3&t=G0BYcOAuS6KULAOG-1" target="_blank" class="quick-link">Figma Static Ads ↗</a>
+                <a href="https://shanemaxco.notion.site/SPB-9cea9176e82d4a6da7427a73dd6e387b?source=copy_link" target="_blank" class="quick-link">SPB Press Quotes ↗</a>
+                <a href="https://shanemaxco.notion.site/TSC-a0433ae707224126b5e6c3bc1ec16b4f?source=copy_link" target="_blank" class="quick-link">TSC Press Quotes ↗</a>
+                <a href="https://drive.google.com/drive/u/1/folders/0AJxcZNEFks45Uk9PVA" target="_blank" class="quick-link">Full Drive ↗</a>
+            </div>
+        </div>
+
+        <!-- Select All Bar -->
+        <div class="select-all-bar">
+            <input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox">
+            <label for="selectAllCheckbox" class="select-all-label">SELECT ALL VISIBLE</label>
+        </div>
+
+        <!-- Asset Grid -->
+        <div class="content-wrapper">
+            <div class="asset-grid" id="assetGrid"></div>
+        </div>
+
+        <!-- More Resources -->
+        <div class="more-resources" id="moreResources">
+            <div class="more-resources-header">
+                <h3>VIDEO LIBRARIES</h3>
+                <p>3,400+ video files across Google Drive, Dropbox, and Frame.io. Browse by category below.</p>
+            </div>
+            <div class="resource-grid">
+                <a href="https://drive.google.com/drive/folders/1T-q8IW7_eb5-3o86i6inFTXrAKVC8PnL" target="_blank" class="resource-card">
+                    <span class="resource-count">773</span>
+                    <span class="resource-label">Internal Video Ads</span>
+                    <span class="resource-sub">Handoff batches 2024-2026</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/18cd6Vb9sZQuGY0SkhF_c_Ov91VcUfY7R" target="_blank" class="resource-card">
+                    <span class="resource-count">918</span>
+                    <span class="resource-label">UGC Videos</span>
+                    <span class="resource-sub">Raw creator content</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1nn1-PGy9ZbWVTKl0ZPSI2dUfejh08iXv" target="_blank" class="resource-card">
+                    <span class="resource-count">602</span>
+                    <span class="resource-label">Eric Hinman</span>
+                    <span class="resource-sub">Videos & edits</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1Xk49CZcVmBcK7uzsrF9DFxWHQypIdOqF" target="_blank" class="resource-card">
+                    <span class="resource-count">328</span>
+                    <span class="resource-label">Primer Video Library</span>
+                    <span class="resource-sub">Primer ad videos</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1U9_-Lv_McBLdR2qSbBvKBRbw5YzgFSN8" target="_blank" class="resource-card">
+                    <span class="resource-count">178</span>
+                    <span class="resource-label">Ariel Moradzadeh</span>
+                    <span class="resource-sub">Creator videos</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1ri3uQMg6fHTViVp44k_VYN6CykrFVH6K" target="_blank" class="resource-card">
+                    <span class="resource-count">190</span>
+                    <span class="resource-label">The Fighter & The Kid</span>
+                    <span class="resource-sub">Podcast clips</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/11PJi_9hoEIYXDPcQWqECyi9Wvvx0Mhtn" target="_blank" class="resource-card">
+                    <span class="resource-count">101</span>
+                    <span class="resource-label">Previous Creators</span>
+                    <span class="resource-sub">Archived creator content</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1HEyKvP85SdyXccGKUdnX2lnMN4D47Oyl" target="_blank" class="resource-card">
+                    <span class="resource-count">47</span>
+                    <span class="resource-label">Inside Only Fans</span>
+                    <span class="resource-sub">Podcast content</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1xOKnQzehCVCQ3MR9dFtFQ-3UTD1O4UJ7" target="_blank" class="resource-card">
+                    <span class="resource-count">40</span>
+                    <span class="resource-label">Mind Pump</span>
+                    <span class="resource-sub">Podcast content</span>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1jawbuibOourB4PIoizSpFTjSCVmeMoFQ" target="_blank" class="resource-card">
+                    <span class="resource-count">39</span>
+                    <span class="resource-label">Viktor Simco</span>
+                    <span class="resource-sub">Creator videos</span>
+                </a>
+                <a href="https://www.dropbox.com/scl/fo/bc1rvhfqe94lz2np5eaay/ACbuB6n5Kols2aMoZbkLxvg?rlkey=mf4qtf67x27238blvycriboyz&dl=0" target="_blank" class="resource-card">
+                    <span class="resource-count">B-ROLL</span>
+                    <span class="resource-label">Eric Hinman B-Roll</span>
+                    <span class="resource-sub">Dropbox — biking, hiking, Hyrox, workout & more</span>
+                </a>
+                <a href="https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/8205f577-1f8d-4a1f-91e6-8ea6299ff1d4" target="_blank" class="resource-card">
+                    <span class="resource-count">ADS</span>
+                    <span class="resource-label">GASS Video Ads</span>
+                    <span class="resource-sub">Frame.io — master ad edits by Dean Rojas</span>
+                </a>
+                <a href="https://drive.google.com/drive/u/1/folders/0AJxcZNEFks45Uk9PVA" target="_blank" class="resource-card resource-card-full">
+                    <span class="resource-label">Browse Full JOYMODE Drive</span>
+                    <span class="resource-sub">All folders, all files</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            All assets are trademarks and copyrights of JoyMode Inc. &copy; 2026. All rights reserved. Unauthorized use is strictly prohibited.
+        </div>
+    </div>
+
+    <!-- Hover Preview -->
+    <div class="hover-preview" id="hoverPreview">
+        <img id="hoverPreviewImg" src="" alt="">
+        <div class="hover-preview-name" id="hoverPreviewName"></div>
+    </div>
+
+    <!-- Floating Action Bar -->
+    <div class="floating-action-bar" id="floatingActionBar">
+        <span class="selected-count">
+            <span id="selectedCountSpan">0</span> SELECTED
+        </span>
+        <button id="downloadButton" style="background: none; border: none; color: var(--white); cursor: pointer; font-weight: 600; font-family: var(--font-body); font-size: 14px;">DOWNLOAD</button>
+    </div>
+
+    <script>
+        // Asset data
+        // Asset data — loaded from external JSON
+        let allAssets = [];
+
+        // Load assets then initialize
+        fetch('data/assets.json')
+            .then(r => r.json())
+            .then(data => {
+                allAssets = data;
+                init();
+            })
+            .catch(err => {
+                console.error('Failed to load assets:', err);
+                document.getElementById('assetCount').textContent = 'ERROR LOADING ASSETS';
+            });
+
+        // State management
+        let filteredAssets = [];
+        let selectedAssets = new Set();
+        let currentView = 'grid-4';
+        let currentProductFilter = '';
+        let currentTypeFilter = '';
+
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const productFilter = document.getElementById('productFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const formatFilter = document.getElementById('formatFilter');
+        const assetGrid = document.getElementById('assetGrid');
+        const assetCount = document.getElementById('assetCount');
+        const floatingActionBar = document.getElementById('floatingActionBar');
+        const selectedCountSpan = document.getElementById('selectedCountSpan');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const downloadButton = document.getElementById('downloadButton');
+        const lastUpdated = document.getElementById('lastUpdated');
+        const autoRefreshBtn = document.getElementById('autoRefreshBtn');
+        const viewButtons = document.querySelectorAll('.view-button');
+
+        // Initialize
+        function init() {
+            // Set default state: show all products
+            currentProductFilter = '';
+            applyFilters();
+            attachEventListeners();
+            updateLastUpdated();
+            initDropdowns();
+        }
+
+        // Initialize dropdowns
+        function initDropdowns() {
+            // Populate type dropdown dynamically based on selected product
+            function updateTypeOptions() {
+                const selectedProduct = productFilter.value;
+                const types = new Set();
+                allAssets.forEach(a => {
+                    if (!selectedProduct || a.product === selectedProduct) {
+                        types.add(a.type);
+                    }
+                });
+                typeFilter.innerHTML = '<option value="">All Types</option>';
+                [...types].sort().forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    typeFilter.appendChild(opt);
+                });
+            }
+
+            productFilter.addEventListener('change', () => {
+                currentProductFilter = productFilter.value;
+                currentTypeFilter = '';
+                updateTypeOptions();
+                typeFilter.value = '';
+                applyFilters();
+            });
+
+            typeFilter.addEventListener('change', () => {
+                currentTypeFilter = typeFilter.value;
+                applyFilters();
+            });
+
+            updateTypeOptions();
+        }
+
+        // Update last updated time
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            lastUpdated.textContent = 'Last updated ' + timeStr;
+        }
+
+        // Render assets to grid
+        function renderAssets() {
+            assetGrid.innerHTML = '';
+            let displayIndex = 0;
+
+            filteredAssets.forEach((asset, index) => {
+                const card = createAssetCard(asset);
+                card.style.animationDelay = (displayIndex * 0.03) + 's';
+                assetGrid.appendChild(card);
+                displayIndex++;
+            });
+
+            // Update asset count
+            const visibleCount = filteredAssets.length;
+            assetCount.textContent = visibleCount + ' ASSET' + (visibleCount !== 1 ? 'S' : '');
+
+            // Reset select all checkbox
+            selectAllCheckbox.checked = false;
+
+            // Placeholders shown for inaccessible thumbnails (no validation needed)
+        }
+
+        // Create asset card
+        function createAssetCard(asset) {
+            const card = document.createElement('div');
+            card.className = 'asset-card';
+            card.setAttribute('data-file-id', asset.fileId);
+            card.setAttribute('draggable', 'true');
+            card.addEventListener('dragstart', (e) => {
+                const mime = {'JPG':'image/jpeg','PNG':'image/png','GIF':'image/gif','SVG':'image/svg+xml','PDF':'application/pdf','MP4':'video/mp4','HEIC':'image/heic'}[asset.format] || 'application/octet-stream';
+                const downloadUrl = `https://drive.google.com/uc?export=download&id=${asset.fileId}`;
+                e.dataTransfer.setData('DownloadURL', `${mime}:${asset.filename}:${downloadUrl}`);
+                e.dataTransfer.setData('text/uri-list', downloadUrl);
+                e.dataTransfer.setData('text/plain', asset.filename);
+                e.dataTransfer.effectAllowed = 'copy';
+            });
+
+            const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
+            const viewUrl = `https://drive.google.com/file/d/${asset.fileId}`;
+
+            card.innerHTML = `
+                <input type="checkbox" class="asset-card-checkbox" data-file-id="${asset.fileId}">
+                <div class="asset-thumbnail">
+                    ${isImage ? '' : `<div class="placeholder">${asset.format}</div>`}
+                </div>
+                <div class="asset-details">
+                    <div class="asset-metadata">${asset.format} • ${asset.type}</div>
+                    <div class="asset-badges">
+                        <span class="badge badge-product">${asset.product}</span>
+                    </div>
+                    <a href="${viewUrl}" target="_blank" class="asset-cta" onclick="event.stopPropagation();">VIEW IN DRIVE</a>
+                </div>
+            `;
+
+            // Add thumbnail image programmatically to avoid quote escaping issues
+            if (isImage) {
+                const thumb = card.querySelector('.asset-thumbnail');
+                const img = document.createElement('img');
+                img.src = `https://lh3.googleusercontent.com/d/${asset.fileId}=w400`;
+                img.alt = asset.filename;
+                img.onerror = function() {
+                    this.remove();
+                    thumb.innerHTML = `<div class="placeholder"><span class="placeholder-format">${asset.format}</span><span class="placeholder-name">${asset.type}</span></div>`;
+                };
+                thumb.appendChild(img);
+            }
+
+            // Add event listeners
+            const checkbox = card.querySelector('.asset-card-checkbox');
+            checkbox.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                toggleAssetSelection(asset.fileId, checkbox.checked);
+            });
+
+            card.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'A') return;
+                checkbox.checked = !checkbox.checked;
+                toggleAssetSelection(asset.fileId, checkbox.checked);
+            });
+
+            // Hover preview
+            if (isImage) {
+                const thumb = card.querySelector('.asset-thumbnail');
+                thumb.addEventListener('mouseenter', (e) => {
+                    const preview = document.getElementById('hoverPreview');
+                    const previewImg = document.getElementById('hoverPreviewImg');
+                    const previewName = document.getElementById('hoverPreviewName');
+                    previewImg.src = `https://drive.google.com/thumbnail?id=${asset.fileId}&sz=w800`;
+                    previewName.textContent = asset.filename;
+                    preview.style.display = 'block';
+                    positionPreview(e, preview);
+                });
+                thumb.addEventListener('mousemove', (e) => {
+                    const preview = document.getElementById('hoverPreview');
+                    positionPreview(e, preview);
+                });
+                thumb.addEventListener('mouseleave', () => {
+                    const preview = document.getElementById('hoverPreview');
+                    preview.style.display = 'none';
+                    document.getElementById('hoverPreviewImg').src = '';
+                });
+            }
+
+            return card;
+        }
+
+        // Position hover preview
+        function positionPreview(e, preview) {
+            const pad = 20;
+            let x = e.clientX + pad;
+            let y = e.clientY - 100;
+            const pw = 600;
+            const ph = 600;
+            if (x + pw > window.innerWidth) x = e.clientX - pw - pad;
+            if (y + ph > window.innerHeight) y = window.innerHeight - ph - pad;
+            if (y < pad) y = pad;
+            preview.style.left = x + 'px';
+            preview.style.top = y + 'px';
+        }
+
+        // Toggle asset selection
+        function toggleAssetSelection(fileId, selected) {
+            if (selected) {
+                selectedAssets.add(fileId);
+            } else {
+                selectedAssets.delete(fileId);
+            }
+            updateUI();
+            updateAssetCardClasses();
+        }
+
+        // Update asset card classes
+        function updateAssetCardClasses() {
+            document.querySelectorAll('.asset-card').forEach(card => {
+                const fileId = card.getAttribute('data-file-id');
+                if (selectedAssets.has(fileId)) {
+                    card.classList.add('selected');
+                    card.querySelector('.asset-card-checkbox').checked = true;
+                } else {
+                    card.classList.remove('selected');
+                    card.querySelector('.asset-card-checkbox').checked = false;
+                }
+            });
+        }
+
+        // Update UI
+        function updateUI() {
+            selectedCountSpan.textContent = selectedAssets.size;
+            floatingActionBar.classList.toggle('active', selectedAssets.size > 0);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const formatValue = formatFilter.value;
+
+            filteredAssets = allAssets.filter(asset => {
+                // Product filter
+                if (currentProductFilter && asset.product !== currentProductFilter) return false;
+
+                // Type filter
+                if (currentTypeFilter && asset.type !== currentTypeFilter) return false;
+
+                // Format filter
+                if (formatValue && asset.format !== formatValue) return false;
+
+                // Search filter
+                if (searchTerm) {
+                    const searchable = (asset.filename + ' ' + asset.product + ' ' + asset.type).toLowerCase();
+                    if (!searchable.includes(searchTerm)) return false;
+                }
+
+                return true;
+            });
+
+            renderAssets();
+        }
+
+        // Attach event listeners
+        function attachEventListeners() {
+            searchInput.addEventListener('input', applyFilters);
+            formatFilter.addEventListener('change', applyFilters);
+
+            // View toggle
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    viewButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentView = btn.getAttribute('data-view');
+                    assetGrid.classList.remove('grid-6', 'grid-10');
+                    if (currentView === 'grid-6') assetGrid.classList.add('grid-6');
+                    if (currentView === 'grid-10') assetGrid.classList.add('grid-10');
+                });
+            });
+
+            // Select all
+            selectAllCheckbox.addEventListener('change', () => {
+                const visibleCards = document.querySelectorAll('.asset-card');
+                visibleCards.forEach(card => {
+                    const fileId = card.getAttribute('data-file-id');
+                    if (selectAllCheckbox.checked) {
+                        selectedAssets.add(fileId);
+                    } else {
+                        selectedAssets.delete(fileId);
+                    }
+                });
+                updateUI();
+                updateAssetCardClasses();
+            });
+
+            // Download selected
+            downloadButton.addEventListener('click', () => {
+                selectedAssets.forEach(fileId => {
+                    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.click();
+                });
+            });
+
+            // Auto-refresh
+            autoRefreshBtn.addEventListener('click', () => {
+                autoRefreshBtn.classList.add('refreshing');
+                updateLastUpdated();
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    selectedAssets.clear();
+                    selectAllCheckbox.checked = false;
+                    updateUI();
+                    updateAssetCardClasses();
+                }
+            });
+        }
+
+        // No longer hiding cards — placeholders shown for inaccessible thumbnails
+        // App starts via fetch callback above
+    </script>
+</body>
+</html>

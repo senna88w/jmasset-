@@ -1,0 +1,12 @@
+{
+  "name": "joymode-asset-library",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Joymode asset library with automated Google Drive scanning",
+  "scripts": {
+    "scan": "node scripts/scan-drive.js"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}

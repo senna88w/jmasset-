@@ -1,0 +1,9 @@
+node_modules/
+.env
+credentials.json
+service-account.json
+*.log
+.DS_Store
+new_assets_found.json
+new_image_assets.txt
+asset_scan_results.json
