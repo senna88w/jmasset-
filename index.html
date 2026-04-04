@@ -1381,7 +1381,19 @@
                 img.src = `https://lh3.googleusercontent.com/d/${asset.fileId}=w400`;
                 img.alt = asset.filename;
                 img.setAttribute('draggable', 'true');
-                img.setAttribute('crossorigin', 'anonymous');
+                img.addEventListener('dragstart', (e) => {
+                    e.stopPropagation();
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    e.dataTransfer.setData('text/html', `<img src="${dataUrl}">`);
+                    e.dataTransfer.setData('text/uri-list', img.src);
+                    e.dataTransfer.setData('text/plain', asset.filename);
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
                 img.onerror = function() {
                     this.remove();
                     thumb.innerHTML = `<div class="placeholder"><span class="placeholder-format">${asset.format}</span><span class="placeholder-name">${asset.type}</span></div>`;
