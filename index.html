@@ -1378,33 +1378,9 @@
             if (isImage) {
                 const thumb = card.querySelector('.asset-thumbnail');
                 const img = document.createElement('img');
-                img.setAttribute('crossorigin', 'anonymous');
                 img.src = `https://lh3.googleusercontent.com/d/${asset.fileId}=w400`;
                 img.alt = asset.filename;
-                img.setAttribute('draggable', 'true');
-                img.addEventListener('dragstart', (e) => {
-                    e.stopPropagation();
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.naturalWidth;
-                        canvas.height = img.naturalHeight;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        const dataUrl = canvas.toDataURL('image/png');
-                        e.dataTransfer.setData('text/html', `<img src="${dataUrl}">`);
-                    } catch (err) {
-                        e.dataTransfer.setData('text/html', `<img src="${img.src}">`);
-                    }
-                    e.dataTransfer.setData('text/uri-list', img.src);
-                    e.dataTransfer.setData('text/plain', asset.filename);
-                    e.dataTransfer.effectAllowed = 'copy';
-                });
                 img.onerror = function() {
-                    if (this.getAttribute('crossorigin')) {
-                        this.removeAttribute('crossorigin');
-                        this.src = this.src;
-                        return;
-                    }
                     this.remove();
                     thumb.innerHTML = `<div class="placeholder"><span class="placeholder-format">${asset.format}</span><span class="placeholder-name">${asset.type}</span></div>`;
                 };
