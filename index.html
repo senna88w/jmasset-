@@ -1356,10 +1356,9 @@
             card.setAttribute('data-file-id', asset.fileId);
             card.setAttribute('draggable', 'true');
             card.addEventListener('dragstart', (e) => {
-                const mime = {'JPG':'image/jpeg','PNG':'image/png','GIF':'image/gif','SVG':'image/svg+xml','PDF':'application/pdf','MP4':'video/mp4','HEIC':'image/heic'}[asset.format] || 'application/octet-stream';
-                const downloadUrl = `https://drive.google.com/uc?export=download&id=${asset.fileId}`;
-                e.dataTransfer.setData('DownloadURL', `${mime}:${asset.filename}:${downloadUrl}`);
-                e.dataTransfer.setData('text/uri-list', downloadUrl);
+                const imgUrl = `https://lh3.googleusercontent.com/d/${asset.fileId}=w800`;
+                e.dataTransfer.setData('text/html', `<img src="${imgUrl}" alt="${asset.filename}">`);
+                e.dataTransfer.setData('text/uri-list', imgUrl);
                 e.dataTransfer.setData('text/plain', asset.filename);
                 e.dataTransfer.effectAllowed = 'copy';
             });
