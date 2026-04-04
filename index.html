@@ -1354,14 +1354,7 @@
             const card = document.createElement('div');
             card.className = 'asset-card';
             card.setAttribute('data-file-id', asset.fileId);
-            card.setAttribute('draggable', 'true');
-            card.addEventListener('dragstart', (e) => {
-                const imgUrl = `https://lh3.googleusercontent.com/d/${asset.fileId}=w800`;
-                e.dataTransfer.setData('text/html', `<img src="${imgUrl}" alt="${asset.filename}">`);
-                e.dataTransfer.setData('text/uri-list', imgUrl);
-                e.dataTransfer.setData('text/plain', asset.filename);
-                e.dataTransfer.effectAllowed = 'copy';
-            });
+            card.setAttribute('draggable', 'false');
 
             const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
             const viewUrl = `https://drive.google.com/file/d/${asset.fileId}`;
