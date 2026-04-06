@@ -242,6 +242,8 @@
         .auto-refresh-btn.refreshing {
             background-color: var(--charcoal-green);
             color: var(--white);
+            pointer-events: none;
+            opacity: 0.8;
         }
 
         .view-toggle {
@@ -1248,7 +1250,10 @@
             container.innerHTML = '';
             assets.forEach(asset => {
                 const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
-                const viewUrl = 'https://drive.google.com/file/d/' + asset.fileId;
+                const isFrameIo = asset.source === 'frame.io';
+                const viewUrl = isFrameIo
+                    ? (asset.sourceUrl || 'https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/' + asset.fileId.replace('frame:',''))
+                    : 'https://drive.google.com/file/d/' + asset.fileId;
 
                 const card = document.createElement('div');
                 card.className = 'recent-card';
@@ -1357,19 +1362,23 @@
             card.setAttribute('data-file-id', asset.fileId);
 
             const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
-            const viewUrl = `https://drive.google.com/file/d/${asset.fileId}`;
+            const isFrameIo = asset.source === 'frame.io';
+            const viewUrl = isFrameIo
+                ? (asset.sourceUrl || `https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/${asset.fileId.replace('frame:','')}`)
+                : `https://drive.google.com/file/d/${asset.fileId}`;
+            const ctaLabel = isFrameIo ? 'VIEW IN FRAME.IO' : 'VIEW IN DRIVE';
 
             card.innerHTML = `
                 <input type="checkbox" class="asset-card-checkbox" data-file-id="${asset.fileId}">
                 <div class="asset-thumbnail">
-                    ${isImage ? '' : `<div class="placeholder">${asset.format}</div>`}
+                    ${isImage ? '' : `<div class="placeholder"><span class="placeholder-format">${asset.format}</span><span class="placeholder-name">${asset.type}</span></div>`}
                 </div>
                 <div class="asset-details">
                     <div class="asset-metadata">${asset.format} • ${asset.type}</div>
                     <div class="asset-badges">
                         <span class="badge badge-product">${asset.product}</span>
                     </div>
-                    <a href="${viewUrl}" target="_blank" class="asset-cta" onclick="event.stopPropagation();">VIEW IN DRIVE</a>
+                    <a href="${viewUrl}" target="_blank" class="asset-cta" onclick="event.stopPropagation();">${ctaLabel}</a>
                 </div>
             `;
 
@@ -1542,13 +1551,100 @@
                 });
             });
 
-            // Auto-refresh
-            autoRefreshBtn.addEventListener('click', () => {
+            // Manual refresh — triggers GitHub Actions workflow to rescan Google Drive
+            const GH_REPO = 'senna88w/jmasset-';
+            const GH_WORKFLOW = 'update-assets.yml';
+            const GH_PAT_KEY = 'joymode_gh_pat';
+
+            function getGhPat() {
+                let pat = localStorage.getItem(GH_PAT_KEY);
+                if (!pat) {
+                    pat = prompt('Enter your GitHub Personal Access Token (fine-grained, actions:write scope):');
+                    if (pat) localStorage.setItem(GH_PAT_KEY, pat.trim());
+                }
+                return pat ? pat.trim() : null;
+            }
+
+            async function triggerWorkflowAndWait(pat) {
+                // Trigger the workflow
+                const dispatchRes = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${pat}`,
+                        'Accept': 'application/vnd.github+json',
+                    },
+                    body: JSON.stringify({ ref: 'main' }),
+                });
+
+                if (dispatchRes.status === 401 || dispatchRes.status === 403) {
+                    localStorage.removeItem(GH_PAT_KEY);
+                    throw new Error('Invalid or expired token. Please try again.');
+                }
+                if (!dispatchRes.ok) {
+                    throw new Error(`GitHub API error: ${dispatchRes.status}`);
+                }
+
+                // Wait a moment for the run to appear, then poll for completion
+                await new Promise(r => setTimeout(r, 3000));
+
+                for (let i = 0; i < 60; i++) {
+                    const runsRes = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?per_page=1&status=in_progress`, {
+                        headers: {
+                            'Authorization': `Bearer ${pat}`,
+                            'Accept': 'application/vnd.github+json',
+                        },
+                    });
+                    const runsData = await runsRes.json();
+
+                    // Also check queued runs
+                    const queuedRes = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?per_page=1&status=queued`, {
+                        headers: {
+                            'Authorization': `Bearer ${pat}`,
+                            'Accept': 'application/vnd.github+json',
+                        },
+                    });
+                    const queuedData = await queuedRes.json();
+
+                    const inProgress = (runsData.total_count || 0) + (queuedData.total_count || 0);
+                    if (inProgress === 0) {
+                        // Workflow finished — check if the latest run succeeded
+                        const latestRes = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?per_page=1`, {
+                            headers: {
+                                'Authorization': `Bearer ${pat}`,
+                                'Accept': 'application/vnd.github+json',
+                            },
+                        });
+                        const latestData = await latestRes.json();
+                        const latest = latestData.workflow_runs?.[0];
+                        if (latest && latest.conclusion !== 'success') {
+                            throw new Error(`Workflow finished with status: ${latest.conclusion}`);
+                        }
+                        return;
+                    }
+
+                    await new Promise(r => setTimeout(r, 5000));
+                }
+                throw new Error('Timed out waiting for scan to complete.');
+            }
+
+            autoRefreshBtn.addEventListener('click', async () => {
+                const pat = getGhPat();
+                if (!pat) return;
+
                 autoRefreshBtn.classList.add('refreshing');
-                updateLastUpdated();
-                setTimeout(() => {
+                autoRefreshBtn.textContent = 'SCANNING DRIVE…';
+
+                try {
+                    await triggerWorkflowAndWait(pat);
+                    autoRefreshBtn.textContent = 'RELOADING…';
+                    // Give GitHub Pages a moment to deploy the new assets.json
+                    await new Promise(r => setTimeout(r, 5000));
                     location.reload();
-                }, 500);
+                } catch (err) {
+                    autoRefreshBtn.classList.remove('refreshing');
+                    autoRefreshBtn.textContent = 'REFRESH';
+                    alert('Refresh failed: ' + err.message);
+                }
             });
 
             // Keyboard shortcuts
