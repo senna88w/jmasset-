@@ -1212,14 +1212,46 @@
             });
         }
 
+        // Helper: get the right thumbnail URL for an asset
+        function getThumbnailUrl(asset) {
+            if (asset.r2Url) {
+                return asset.r2Url;
+            }
+            if (asset.source === 'Figma Export' && asset.localPath) {
+                return asset.localPath;
+            }
+            return 'https://lh3.googleusercontent.com/d/' + asset.fileId + '=w400';
+        }
+
+        // Helper: get the right view URL for an asset
+        function getViewUrl(asset) {
+            if (asset.source === 'frame.io') {
+                return asset.sourceUrl || 'https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/' + asset.fileId.replace('frame:','');
+            }
+            if (asset.source === 'Figma Export') {
+                return 'https://www.figma.com/design/KjgU10dhEQWiQgGUbsh2Jk/Ad-Exploration';
+            }
+            return 'https://drive.google.com/file/d/' + asset.fileId;
+        }
+
+        // Helper: get CTA label
+        function getCtaLabel(asset) {
+            if (asset.source === 'frame.io') return 'View in Frame.io';
+            if (asset.source === 'Figma Export') return 'View in Figma';
+            return 'View in Drive';
+        }
+
         function buildRecentCards(assets, container, showDate) {
             container.innerHTML = '';
-            assets.forEach(asset => {
+
+            // Prioritize images over video placeholders in recently added
+            const images = assets.filter(a => ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(a.format));
+            const nonImages = assets.filter(a => !['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(a.format));
+            const sorted = [...images, ...nonImages].slice(0, 50);
+
+            sorted.forEach(asset => {
                 const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
-                const isFrameIo = asset.source === 'frame.io';
-                const viewUrl = isFrameIo
-                    ? (asset.sourceUrl || 'https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/' + asset.fileId.replace('frame:',''))
-                    : 'https://drive.google.com/file/d/' + asset.fileId;
+                const viewUrl = getViewUrl(asset);
 
                 const card = document.createElement('div');
                 card.className = 'recent-card';
@@ -1238,7 +1270,7 @@
                 if (isImage) {
                     const thumb = card.querySelector('.asset-thumbnail');
                     const img = document.createElement('img');
-                    img.src = 'https://lh3.googleusercontent.com/d/' + asset.fileId + '=w400';
+                    img.src = getThumbnailUrl(asset);
                     img.alt = asset.filename;
                     img.loading = 'lazy';
                     img.onerror = function() {
@@ -1328,11 +1360,8 @@
             card.setAttribute('data-file-id', asset.fileId);
 
             const isImage = ['JPG', 'PNG', 'GIF', 'SVG', 'HEIC'].includes(asset.format);
-            const isFrameIo = asset.source === 'frame.io';
-            const viewUrl = isFrameIo
-                ? (asset.sourceUrl || `https://app.frame.io/reviews/7021a5a2-6504-4858-ab99-d6baf737f60a/${asset.fileId.replace('frame:','')}`)
-                : `https://drive.google.com/file/d/${asset.fileId}`;
-            const ctaLabel = isFrameIo ? 'View in Frame.io' : 'View in Drive';
+            const viewUrl = getViewUrl(asset);
+            const ctaLabel = getCtaLabel(asset);
 
             card.innerHTML = `
                 <input type="checkbox" class="asset-card-checkbox" data-file-id="${asset.fileId}">
@@ -1340,6 +1369,7 @@
                     ${isImage ? '' : `<div class="placeholder"><span class="placeholder-format">${asset.format}</span><span class="placeholder-name">${asset.type}</span></div>`}
                 </div>
                 <div class="asset-details">
+                    <div class="asset-name" title="${asset.filename}">${asset.filename}</div>
                     <div class="asset-metadata">${asset.format} • ${asset.type}</div>
                     <div class="asset-badges">
                         <span class="badge badge-product">${asset.product}</span>
@@ -1352,7 +1382,7 @@
             if (isImage) {
                 const thumb = card.querySelector('.asset-thumbnail');
                 const img = document.createElement('img');
-                img.src = `https://lh3.googleusercontent.com/d/${asset.fileId}=w400`;
+                img.src = getThumbnailUrl(asset);
                 img.alt = asset.filename;
                 img.onerror = function() {
                     this.remove();
@@ -1384,7 +1414,7 @@
                     const preview = document.getElementById('hoverPreview');
                     const previewImg = document.getElementById('hoverPreviewImg');
                     const previewName = document.getElementById('hoverPreviewName');
-                    previewImg.src = `https://drive.google.com/thumbnail?id=${asset.fileId}&sz=w800`;
+                    previewImg.src = asset.r2Url ? asset.r2Url : `https://drive.google.com/thumbnail?id=${asset.fileId}&sz=w800`;
                     previewName.textContent = asset.filename;
                     preview.style.display = 'block';
                     positionPreview(e, preview);
